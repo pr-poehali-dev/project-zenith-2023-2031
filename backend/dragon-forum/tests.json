@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "Список вопросов",
+      "method": "GET",
+      "path": "/?kind=questions&action=list",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Список заявок",
+      "method": "GET",
+      "path": "/?kind=requests&action=list",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Создать вопрос",
+      "method": "POST",
+      "path": "/?kind=questions&action=create",
+      "body": {"author": "Тест Пользователь", "text": "Тестовый вопрос?"},
+      "expectedStatus": 200,
+      "expectedBody": {"author": "Тест Пользователь", "answered": false},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Создать заявку",
+      "method": "POST",
+      "path": "/?kind=requests&action=create",
+      "body": {"author": "Тест Заявитель", "text": "Тестовая проблема"},
+      "expectedStatus": 200,
+      "expectedBody": {"answered": false},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

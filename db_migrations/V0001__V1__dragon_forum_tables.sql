@@ -1,0 +1,20 @@
+
+CREATE TABLE IF NOT EXISTS dragon_questions (
+  id SERIAL PRIMARY KEY,
+  author VARCHAR(100) NOT NULL,
+  avatar VARCHAR(10) NOT NULL,
+  text TEXT NOT NULL,
+  answer TEXT,
+  answered BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS dragon_requests (
+  id SERIAL PRIMARY KEY,
+  author VARCHAR(100) NOT NULL,
+  avatar VARCHAR(10) NOT NULL,
+  text TEXT NOT NULL,
+  answer TEXT,
+  answered BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
