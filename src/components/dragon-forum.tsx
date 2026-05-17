@@ -8,6 +8,9 @@ import Icon from "@/components/ui/icon"
 
 const API = "https://functions.poehali.dev/6d575e2a-93a2-41c0-b2ff-4a247ee4f5b4"
 
+const OWNER_VK = "https://vk.com/renatplatonov"
+const DIRECTOR_TG = "https://t.me/haitaniboss"
+
 type Tab = "news" | "questions" | "requests"
 
 type NewsItem = {
@@ -27,6 +30,16 @@ type ForumPost = {
   date: string
   answer?: string | null
   answered: boolean
+}
+
+type TeamMember = {
+  name: string
+  role: string
+  roleColor: string
+  roleBg: string
+  emoji: string
+  link?: string
+  linkLabel?: string
 }
 
 const NEWS: NewsItem[] = [
@@ -56,6 +69,69 @@ const NEWS: NewsItem[] = [
   },
 ]
 
+const TEAM: TeamMember[] = [
+  {
+    name: "Ренат Платонов",
+    role: "Владелец",
+    roleColor: "text-yellow-300",
+    roleBg: "bg-yellow-500/20 border-yellow-500/40",
+    emoji: "👑",
+    link: OWNER_VK,
+    linkLabel: "ВКонтакте",
+  },
+  {
+    name: "Заместитель Владельца",
+    role: "Заместитель Владельца",
+    roleColor: "text-amber-300",
+    roleBg: "bg-amber-500/20 border-amber-500/40",
+    emoji: "🥇",
+  },
+  {
+    name: "haitaniboss",
+    role: "Директор",
+    roleColor: "text-purple-300",
+    roleBg: "bg-purple-500/20 border-purple-500/40",
+    emoji: "🎯",
+    link: DIRECTOR_TG,
+    linkLabel: "Telegram",
+  },
+  {
+    name: "Руководитель",
+    role: "Руководитель",
+    roleColor: "text-blue-300",
+    roleBg: "bg-blue-500/20 border-blue-500/40",
+    emoji: "📋",
+  },
+  {
+    name: "Заместитель Руководителя",
+    role: "Заместитель Руководителя",
+    roleColor: "text-cyan-300",
+    roleBg: "bg-cyan-500/20 border-cyan-500/40",
+    emoji: "📌",
+  },
+  {
+    name: "Администрация",
+    role: "Администрация",
+    roleColor: "text-green-300",
+    roleBg: "bg-green-500/20 border-green-500/40",
+    emoji: "🛡️",
+  },
+  {
+    name: "Техническая поддержка",
+    role: "Техническая поддержка",
+    roleColor: "text-orange-300",
+    roleBg: "bg-orange-500/20 border-orange-500/40",
+    emoji: "🔧",
+  },
+  {
+    name: "Бухгалтер",
+    role: "Бухгалтер",
+    roleColor: "text-pink-300",
+    roleBg: "bg-pink-500/20 border-pink-500/40",
+    emoji: "💼",
+  },
+]
+
 const AVATAR_GRADIENTS = [
   "bg-gradient-to-br from-purple-500 to-blue-600",
   "bg-gradient-to-br from-blue-500 to-cyan-600",
@@ -73,8 +149,9 @@ function AvatarCircle({ initials, index }: { initials: string; index: number }) 
 }
 
 function PostItem({ post, index, accentColor }: { post: ForumPost; index: number; accentColor: string }) {
+  const isPurple = accentColor === "purple"
   return (
-    <div className={`rounded-2xl border ${accentColor === "purple" ? "border-purple-500/15" : "border-orange-500/15"} bg-[#0d0d1a] p-4 space-y-3`}>
+    <div className={`rounded-2xl border ${isPurple ? "border-purple-500/15" : "border-orange-500/15"} bg-[#0d0d1a] p-4 space-y-3`}>
       <div className="flex items-center gap-3">
         <AvatarCircle initials={post.avatar} index={index} />
         <div>
@@ -83,17 +160,17 @@ function PostItem({ post, index, accentColor }: { post: ForumPost; index: number
         </div>
         <div className="ml-auto">
           {post.answered
-            ? <Badge className="bg-green-500/20 text-green-300 border-0 text-xs">{accentColor === "orange" ? "Закрыта" : "Отвечено"}</Badge>
-            : <Badge className={`${accentColor === "orange" ? "bg-orange-500/20 text-orange-300" : "bg-yellow-500/20 text-yellow-300"} border-0 text-xs`}>{accentColor === "orange" ? "В работе" : "Ожидает"}</Badge>
+            ? <Badge className="bg-green-500/20 text-green-300 border-0 text-xs">{isPurple ? "Отвечено" : "Закрыта"}</Badge>
+            : <Badge className={`${isPurple ? "bg-yellow-500/20 text-yellow-300" : "bg-orange-500/20 text-orange-300"} border-0 text-xs`}>{isPurple ? "Ожидает" : "В работе"}</Badge>
           }
         </div>
       </div>
       <p className="text-gray-300 text-sm leading-relaxed">{post.text}</p>
       {post.answer && (
-        <div className={`ml-4 pl-4 border-l-2 ${accentColor === "orange" ? "border-orange-500/40" : "border-purple-500/40"}`}>
+        <div className={`ml-4 pl-4 border-l-2 ${isPurple ? "border-purple-500/40" : "border-orange-500/40"}`}>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-base">🐉</span>
-            <p className={`${accentColor === "orange" ? "text-orange-300" : "text-purple-300"} text-xs font-bold font-orbitron`}>Команда Carnival Dragon</p>
+            <p className={`${isPurple ? "text-purple-300" : "text-orange-300"} text-xs font-bold font-orbitron`}>Команда Carnival Dragon</p>
           </div>
           <p className="text-gray-300 text-sm leading-relaxed">{post.answer}</p>
         </div>
@@ -127,9 +204,7 @@ export function DragonForum() {
       }))
       if (kind === "questions") setQuestions(posts)
       else setRequests(posts)
-    } catch {
-      // молча игнорируем
-    } finally {
+    } catch { /* молча */ } finally {
       setLoading(false)
     }
   }, [])
@@ -150,16 +225,10 @@ export function DragonForum() {
       })
       const raw = await res.json()
       const post: ForumPost = typeof raw === "string" ? JSON.parse(raw) : raw
-      setQuestions(prev => [{ ...post, answer: post.answer || null }, ...prev])
-      setQName("")
-      setQText("")
-      setQSent(true)
-      setTimeout(() => setQSent(false), 3000)
-    } catch {
-      // молча игнорируем
-    } finally {
-      setSubmitting(false)
-    }
+      setQuestions(prev => [{ ...post, answer: null }, ...prev])
+      setQName(""); setQText("")
+      setQSent(true); setTimeout(() => setQSent(false), 3000)
+    } catch { /* молча */ } finally { setSubmitting(false) }
   }
 
   const submitRequest = async () => {
@@ -173,16 +242,10 @@ export function DragonForum() {
       })
       const raw = await res.json()
       const post: ForumPost = typeof raw === "string" ? JSON.parse(raw) : raw
-      setRequests(prev => [{ ...post, answer: post.answer || null }, ...prev])
-      setRName("")
-      setRText("")
-      setRSent(true)
-      setTimeout(() => setRSent(false), 3000)
-    } catch {
-      // молча игнорируем
-    } finally {
-      setSubmitting(false)
-    }
+      setRequests(prev => [{ ...post, answer: null }, ...prev])
+      setRName(""); setRText("")
+      setRSent(true); setTimeout(() => setRSent(false), 3000)
+    } catch { /* молча */ } finally { setSubmitting(false) }
   }
 
   const tabs: { key: Tab; label: string; icon: string }[] = [
@@ -196,16 +259,62 @@ export function DragonForum() {
       <div className="max-w-5xl mx-auto px-4">
 
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="inline-flex items-center gap-3 mb-4">
             <span className="text-4xl">🐉</span>
             <h2 className="text-4xl md:text-5xl font-bold text-white font-orbitron">
               Carnival <span className="carnival-gradient">Dragon</span>
             </h2>
           </div>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-6">
             Официальный форум сообщества — новости, ответы на вопросы и обработка заявок командой
           </p>
+
+          {/* Прямая связь */}
+          <div className="flex flex-wrap justify-center gap-3">
+            <a
+              href={OWNER_VK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0077FF]/20 border border-[#0077FF]/40 text-blue-300 text-sm font-semibold hover:bg-[#0077FF]/30 transition-all"
+            >
+              <span>👑</span> Связь с Владельцем — ВКонтакте
+            </a>
+            <a
+              href={DIRECTOR_TG}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#229ED9]/20 border border-[#229ED9]/40 text-sky-300 text-sm font-semibold hover:bg-[#229ED9]/30 transition-all"
+            >
+              <span>🎯</span> Связь с Директором — Telegram
+            </a>
+          </div>
+        </div>
+
+        {/* Команда форума */}
+        <div className="mb-10">
+          <p className="text-gray-500 text-xs uppercase tracking-widest text-center mb-4">Команда форума</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {TEAM.map((member) => (
+              <div key={member.role} className={`rounded-xl border ${member.roleBg} p-3 flex flex-col items-center text-center gap-1`}>
+                <span className="text-2xl">{member.emoji}</span>
+                <span className={`text-xs font-bold font-orbitron ${member.roleColor}`}>{member.role}</span>
+                {member.name !== member.role && (
+                  <span className="text-gray-400 text-xs">{member.name}</span>
+                )}
+                {member.link && (
+                  <a
+                    href={member.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-xs ${member.roleColor} underline underline-offset-2 opacity-80 hover:opacity-100`}
+                  >
+                    {member.linkLabel}
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Tabs */}
@@ -225,7 +334,7 @@ export function DragonForum() {
           ))}
         </div>
 
-        {/* NEWS TAB */}
+        {/* NEWS */}
         {tab === "news" && (
           <div className="space-y-4">
             {NEWS.map(item => (
@@ -245,102 +354,56 @@ export function DragonForum() {
           </div>
         )}
 
-        {/* QUESTIONS TAB */}
+        {/* QUESTIONS */}
         {tab === "questions" && (
           <div className="space-y-6">
             <Card className="carnival-border bg-[#0d0d1a] border-0">
               <CardContent className="pt-5 space-y-3">
                 <p className="text-white font-orbitron font-semibold text-sm mb-3">Задать вопрос команде</p>
-                <Input
-                  placeholder="Ваше имя"
-                  value={qName}
-                  onChange={e => setQName(e.target.value)}
-                  className="bg-[#1a1a2e] border-purple-500/30 text-white placeholder:text-gray-500 text-sm"
-                />
-                <Textarea
-                  placeholder="Ваш вопрос..."
-                  value={qText}
-                  onChange={e => setQText(e.target.value)}
-                  rows={3}
-                  className="bg-[#1a1a2e] border-purple-500/30 text-white placeholder:text-gray-500 text-sm resize-none"
-                />
-                {qSent && (
-                  <p className="text-green-400 text-xs flex items-center gap-1">
-                    <Icon name="CheckCircle" size={13} /> Вопрос отправлен — команда ответит в ближайшее время!
-                  </p>
-                )}
-                <Button
-                  onClick={submitQuestion}
-                  disabled={!qName.trim() || !qText.trim() || submitting}
-                  className="carnival-gradient-bg hover:opacity-90 text-white border-0 text-sm"
-                >
+                <Input placeholder="Ваше имя" value={qName} onChange={e => setQName(e.target.value)}
+                  className="bg-[#1a1a2e] border-purple-500/30 text-white placeholder:text-gray-500 text-sm" />
+                <Textarea placeholder="Ваш вопрос..." value={qText} onChange={e => setQText(e.target.value)}
+                  rows={3} className="bg-[#1a1a2e] border-purple-500/30 text-white placeholder:text-gray-500 text-sm resize-none" />
+                {qSent && <p className="text-green-400 text-xs flex items-center gap-1"><Icon name="CheckCircle" size={13} /> Вопрос отправлен — команда ответит в ближайшее время!</p>}
+                <Button onClick={submitQuestion} disabled={!qName.trim() || !qText.trim() || submitting}
+                  className="carnival-gradient-bg hover:opacity-90 text-white border-0 text-sm">
                   {submitting ? "Отправляем..." : "Отправить вопрос"}
                 </Button>
               </CardContent>
             </Card>
-
-            {loading ? (
-              <div className="text-center text-gray-500 py-8">
-                <Icon name="Loader" size={24} className="animate-spin mx-auto mb-2" />
-                <p className="text-sm">Загружаем вопросы...</p>
-              </div>
-            ) : questions.length === 0 ? (
-              <p className="text-center text-gray-600 py-8 text-sm">Вопросов пока нет — будьте первым!</p>
-            ) : (
-              <div className="space-y-4">
-                {questions.map((q, i) => <PostItem key={q.id} post={q} index={i} accentColor="purple" />)}
-              </div>
-            )}
+            {loading
+              ? <div className="text-center text-gray-500 py-8"><Icon name="Loader" size={24} className="animate-spin mx-auto mb-2" /><p className="text-sm">Загружаем...</p></div>
+              : questions.length === 0
+                ? <p className="text-center text-gray-600 py-8 text-sm">Вопросов пока нет — будьте первым!</p>
+                : <div className="space-y-4">{questions.map((q, i) => <PostItem key={q.id} post={q} index={i} accentColor="purple" />)}</div>
+            }
           </div>
         )}
 
-        {/* REQUESTS TAB */}
+        {/* REQUESTS */}
         {tab === "requests" && (
           <div className="space-y-6">
             <Card className="carnival-border bg-[#0d0d1a] border-0">
               <CardContent className="pt-5 space-y-3">
                 <p className="text-white font-orbitron font-semibold text-sm mb-1">Создать заявку</p>
                 <p className="text-gray-500 text-xs mb-3">Опишите проблему подробно — команда рассмотрит в течение суток</p>
-                <Input
-                  placeholder="Ваше имя"
-                  value={rName}
-                  onChange={e => setRName(e.target.value)}
-                  className="bg-[#1a1a2e] border-orange-500/30 text-white placeholder:text-gray-500 text-sm"
-                />
-                <Textarea
-                  placeholder="Опишите проблему или запрос..."
-                  value={rText}
-                  onChange={e => setRText(e.target.value)}
-                  rows={4}
-                  className="bg-[#1a1a2e] border-orange-500/30 text-white placeholder:text-gray-500 text-sm resize-none"
-                />
-                {rSent && (
-                  <p className="text-green-400 text-xs flex items-center gap-1">
-                    <Icon name="CheckCircle" size={13} /> Заявка принята — рассмотрим в ближайшее время!
-                  </p>
-                )}
-                <Button
-                  onClick={submitRequest}
-                  disabled={!rName.trim() || !rText.trim() || submitting}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 text-white border-0 text-sm"
-                >
+                <Input placeholder="Ваше имя" value={rName} onChange={e => setRName(e.target.value)}
+                  className="bg-[#1a1a2e] border-orange-500/30 text-white placeholder:text-gray-500 text-sm" />
+                <Textarea placeholder="Опишите проблему или запрос..." value={rText} onChange={e => setRText(e.target.value)}
+                  rows={4} className="bg-[#1a1a2e] border-orange-500/30 text-white placeholder:text-gray-500 text-sm resize-none" />
+                {rSent && <p className="text-green-400 text-xs flex items-center gap-1"><Icon name="CheckCircle" size={13} /> Заявка принята — рассмотрим в ближайшее время!</p>}
+                <Button onClick={submitRequest} disabled={!rName.trim() || !rText.trim() || submitting}
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 text-white border-0 text-sm">
                   {submitting ? "Отправляем..." : "Отправить заявку"}
                 </Button>
               </CardContent>
             </Card>
-
-            {loading ? (
-              <div className="text-center text-gray-500 py-8">
-                <Icon name="Loader" size={24} className="animate-spin mx-auto mb-2" />
-                <p className="text-sm">Загружаем заявки...</p>
-              </div>
-            ) : requests.length === 0 ? (
-              <p className="text-center text-gray-600 py-8 text-sm">Заявок пока нет</p>
-            ) : (
-              <div className="space-y-4">
-                {requests.map((r, i) => <PostItem key={r.id} post={r} index={i + 2} accentColor="orange" />)}
-              </div>
-            )}
+            {loading
+              ? <div className="text-center text-gray-500 py-8"><Icon name="Loader" size={24} className="animate-spin mx-auto mb-2" /><p className="text-sm">Загружаем...</p></div>
+              : requests.length === 0
+                ? <p className="text-center text-gray-600 py-8 text-sm">Заявок пока нет</p>
+                : <div className="space-y-4">{requests.map((r, i) => <PostItem key={r.id} post={r} index={i + 2} accentColor="orange" />)}</div>
+            }
           </div>
         )}
 
