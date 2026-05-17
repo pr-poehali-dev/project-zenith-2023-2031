@@ -2,6 +2,7 @@ import { Canvas, extend, useFrame } from "@react-three/fiber"
 import { useAspect, useTexture } from "@react-three/drei"
 import { useMemo, useRef, useState, useEffect } from "react"
 import * as THREE from "three"
+import { Button } from "@/components/ui/button"
 
 const TEXTUREMAP = { src: "https://i.postimg.cc/XYwvXN8D/img-4.png" }
 const DEPTHMAP = { src: "https://i.postimg.cc/2SHKQh2q/raw-4.webp" }
@@ -32,7 +33,6 @@ const Scene = () => {
       uniform float uTime;
       varying vec2 vUv;
 
-      // Simple noise function
       float random(vec2 st) {
         return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
       }
@@ -51,15 +51,12 @@ const Scene = () => {
       void main() {
         vec2 uv = vUv;
 
-        // Depth-based displacement
         float depth = texture2D(uDepthMap, uv).r;
         vec2 displacement = depth * uPointer * 0.01;
         vec2 distortedUv = uv + displacement;
 
-        // Base texture
         vec4 baseColor = texture2D(uTexture, distortedUv);
 
-        // Create scanning effect
         float aspect = ${WIDTH}.0 / ${HEIGHT}.0;
         vec2 tUv = vec2(uv.x * aspect, uv.y);
         vec2 tiling = vec2(120.0);
@@ -69,13 +66,24 @@ const Scene = () => {
         float dist = length(tiledUv);
         float dot = smoothstep(0.5, 0.49, dist) * brightness;
 
-        // Flow effect based on progress
         float flow = 1.0 - smoothstep(0.0, 0.02, abs(depth - uProgress));
 
-        // Red scanning overlay
-        vec3 mask = vec3(dot * flow * 10.0, 0.0, 0.0);
+        // Multicolor carnival gradient overlay
+        float t = uTime * 0.3;
+        vec3 color1 = vec3(0.663, 0.333, 0.969); // purple
+        vec3 color2 = vec3(0.231, 0.510, 0.969); // blue
+        vec3 color3 = vec3(0.024, 0.714, 0.831); // cyan
+        vec3 color4 = vec3(0.976, 0.451, 0.086); // orange
 
-        // Combine effects
+        float mixT = mod(t + uv.x + uv.y, 4.0);
+        vec3 gradColor;
+        if (mixT < 1.0) gradColor = mix(color1, color2, mixT);
+        else if (mixT < 2.0) gradColor = mix(color2, color3, mixT - 1.0);
+        else if (mixT < 3.0) gradColor = mix(color3, color4, mixT - 2.0);
+        else gradColor = mix(color4, color1, mixT - 3.0);
+
+        vec3 mask = gradColor * dot * flow * 8.0;
+
         vec3 final = baseColor.rgb + mask;
 
         gl_FragColor = vec4(final, 1.0);
@@ -114,8 +122,8 @@ const Scene = () => {
 }
 
 export const Hero3DWebGL = () => {
-  const titleWords = "Synapse AI".split(" ")
-  const subtitle = "Нейроинтерфейсы нового поколения."
+  const titleWords = "Carnival Pantera".split(" ")
+  const subtitle = "Твоя площадка для уникального видео-контента"
   const [visibleWords, setVisibleWords] = useState(0)
   const [subtitleVisible, setSubtitleVisible] = useState(false)
   const [delays, setDelays] = useState<number[]>([])
@@ -145,16 +153,17 @@ export const Hero3DWebGL = () => {
         <div className="absolute top-0 bottom-0 right-0 w-32 bg-gradient-to-l from-black to-transparent" />
       </div>
 
-      <div className="h-screen uppercase items-center w-full absolute z-[60] pointer-events-none px-10 flex justify-center flex-col">
+      <div className="h-screen uppercase items-center w-full absolute z-[60] pointer-events-none px-10 flex justify-center flex-col gap-6">
         <div className="text-3xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold font-orbitron">
-          <div className="flex space-x-2 lg:space-x-6 overflow-hidden text-white">
+          <div className="flex space-x-2 lg:space-x-6 overflow-hidden">
             {titleWords.map((word, index) => (
               <div
                 key={index}
-                className={index < visibleWords ? "fade-in" : ""}
+                className={`carnival-gradient ${index < visibleWords ? "fade-in" : ""}`}
                 style={{
                   animationDelay: `${index * 0.13 + (delays[index] || 0)}s`,
                   opacity: index < visibleWords ? undefined : 0,
+                  WebkitTextFillColor: index < visibleWords ? undefined : "transparent",
                 }}
               >
                 {word}
@@ -162,7 +171,7 @@ export const Hero3DWebGL = () => {
             ))}
           </div>
         </div>
-        <div className="text-xs md:text-xl xl:text-2xl 2xl:text-3xl mt-2 overflow-hidden text-white font-bold max-w-4xl mx-auto text-center px-4">
+        <div className="text-xs md:text-xl xl:text-2xl 2xl:text-3xl mt-2 overflow-hidden text-white font-bold max-w-4xl mx-auto text-center px-4 normal-case">
           <div
             className={subtitleVisible ? "fade-in-subtitle" : ""}
             style={{
@@ -173,6 +182,23 @@ export const Hero3DWebGL = () => {
             {subtitle}
           </div>
         </div>
+        {subtitleVisible && (
+          <div className="pointer-events-auto flex gap-4 flex-col sm:flex-row fade-in-subtitle normal-case">
+            <Button
+              size="lg"
+              className="carnival-gradient-bg hover:opacity-90 text-white text-lg px-8 font-semibold border-0"
+            >
+              Смотреть каталог
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-purple-500/50 text-white hover:bg-purple-500/20 text-lg px-8 bg-transparent"
+            >
+              Carnival Dragon →
+            </Button>
+          </div>
+        )}
       </div>
 
       <Canvas

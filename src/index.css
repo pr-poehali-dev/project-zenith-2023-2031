@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 0 84% 60%;
+    --primary: 271 81% 56%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 10%;
@@ -24,7 +24,7 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 84% 60%;
+    --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -32,57 +32,57 @@
 
     --border: 0 0% 90%;
     --input: 0 0% 100%;
-    --ring: 0 84% 60%;
+    --ring: 271 81% 56%;
 
     --radius: 0.625rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 0 84% 60%;
+    --sidebar-primary: 271 81% 56%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 84% 60%;
+    --sidebar-accent: 271 81% 56%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 0 84% 60%;
+    --sidebar-ring: 271 81% 56%;
   }
 
   .dark {
-    --background: 0 0% 3%;
+    --background: 260 20% 4%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 5%;
+    --card: 260 15% 7%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 5%;
+    --popover: 260 15% 7%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 84% 60%;
+    --primary: 271 81% 62%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 10%;
+    --muted: 260 15% 12%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 0 84% 60%;
+    --accent: 24 100% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 10%;
-    --ring: 0 84% 60%;
+    --border: 260 15% 18%;
+    --input: 260 15% 10%;
+    --ring: 271 81% 62%;
 
-    --sidebar-background: 0 0% 5%;
+    --sidebar-background: 260 15% 5%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 84% 60%;
+    --sidebar-primary: 271 81% 62%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 0 84% 60%;
+    --sidebar-border: 260 15% 18%;
+    --sidebar-ring: 271 81% 62%;
   }
 }
 
@@ -102,19 +102,50 @@
 
 @layer components {
   .font-orbitron {
-    font-family: 'Play', sans-serif;
+    font-family: "Exo 2", sans-serif;
   }
 
   .font-geist {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
   }
 
   .font-space-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
   }
 
   .font-display {
-    font-family: 'Play', sans-serif;
+    font-family: "Exo 2", sans-serif;
+  }
+
+  .carnival-gradient {
+    background: linear-gradient(
+      135deg,
+      #a855f7 0%,
+      #3b82f6 35%,
+      #06b6d4 60%,
+      #f97316 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .carnival-gradient-bg {
+    background: linear-gradient(
+      135deg,
+      #a855f7 0%,
+      #3b82f6 35%,
+      #06b6d4 60%,
+      #f97316 100%
+    );
+  }
+
+  .carnival-border {
+    position: relative;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+      linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4, #f97316) border-box;
   }
 
   .fade-in {
@@ -136,8 +167,9 @@
   .glow-border {
     position: relative;
     border: 1px solid transparent;
-    background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
-      linear-gradient(45deg, hsl(var(--primary)), hsl(var(--accent))) border-box;
+    background:
+      linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+      linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4, #f97316) border-box;
   }
 
   .pulse-button {
@@ -213,4 +245,19 @@
   60% {
     transform: translateY(-1px);
   }
+}
+
+@keyframes chatPop {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.chat-pop {
+  animation: chatPop 0.3s ease-out forwards;
 }

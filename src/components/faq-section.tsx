@@ -3,52 +3,54 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 export function FAQSection() {
   const faqs = [
     {
-      question: "Насколько безопасна процедура SynapseAI?",
+      question: "Как купить видео на Carnival Pantera?",
       answer:
-        "Да, процедура выполняется прецизионным хирургическим роботом и прошла обширное тестирование. Все материалы биосовместимы и одобрены FDA для медицинского применения.",
+        "Выберите интересующее видео в каталоге, нажмите «Купить», оплатите удобным способом — доступ откроется мгновенно в вашем личном кабинете.",
     },
     {
-      question: "Сколько длится операция?",
+      question: "Что такое Carnival Dragon?",
       answer:
-        "Малоинвазивная процедура обычно занимает 2-3 часа и проводится под местной анестезией с седацией.",
+        "Carnival Dragon — это наш форум сообщества. Там команда отвечает на вопросы, рассматривает заявки и анонсирует новинки. Присоединяйтесь к обсуждениям!",
     },
     {
-      question: "Можно ли удалить устройство?",
+      question: "Как связаться с техподдержкой?",
       answer:
-        "Да, SynapseAI разработан полностью обратимым. Устройство можно безопасно удалить при необходимости, хотя это требуется редко.",
+        "Воспользуйтесь чат-ботом в правом нижнем углу страницы — он мгновенно ответит на частые вопросы. Если нужна живая помощь, запрос автоматически передаётся автору.",
     },
     {
-      question: "Какие ощущения при использовании SynapseAI?",
+      question: "Можно ли вернуть деньги за видео?",
       answer:
-        "Пользователи отмечают, что управление устройствами силой мысли ощущается естественно и интуитивно после короткого периода обучения. От самого импланта нет физических ощущений.",
+        "Каждый случай рассматривается индивидуально. Напишите в техподдержку или на форум Carnival Dragon — разберёмся вместе.",
     },
     {
-      question: "Как долго работает батарея?",
+      question: "Как долго доступ к видео действует?",
       answer:
-        "Устройство заряжается беспроводным способом и работает полный день на одном заряде. Зарядка выполняется внешним устройством, размещаемым рядом с головой.",
+        "После покупки доступ к видео остаётся постоянным — смотрите в любое удобное время без ограничений.",
     },
     {
-      question: "Кто может получить SynapseAI?",
+      question: "Где следить за новыми видео?",
       answer:
-        "В настоящее время мы фокусируемся на людях с тяжелым параличом. Соответствие определяется через комплексную медицинскую оценку.",
+        "Все анонсы новинок публикуются первыми на форуме Carnival Dragon. Зарегистрируйтесь там, чтобы не пропустить ни одного обновления.",
     },
   ]
 
   return (
-    <section className="py-24 bg-black">
+    <section id="faq" className="py-24 bg-black">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 font-orbitron">Частые вопросы</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 font-orbitron">
+            Частые <span className="carnival-gradient">вопросы</span>
+          </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto font-space-mono">
-            Ответы на популярные вопросы о технологии SynapseAI, безопасности и опыте пациентов.
+            Ответы на популярные вопросы о Carnival Pantera, Carnival Dragon и техподдержке
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-red-500/20 mb-4">
-                <AccordionTrigger className="text-left text-lg font-semibold text-white hover:text-red-400 font-orbitron px-6 py-4">
+              <AccordionItem key={index} value={`item-${index}`} className="border-purple-500/20 mb-4">
+                <AccordionTrigger className="text-left text-lg font-semibold text-white hover:text-purple-400 font-orbitron px-6 py-4">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-gray-300 leading-relaxed px-6 pb-4 font-space-mono">

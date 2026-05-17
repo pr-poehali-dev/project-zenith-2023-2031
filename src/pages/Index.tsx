@@ -9,6 +9,7 @@ import { FAQSection } from "@/components/faq-section"
 import { CTASection } from "@/components/cta-section"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { SupportChat } from "@/components/support-chat"
 
 export default function Index() {
   return (
@@ -32,6 +33,7 @@ export default function Index() {
         <CTASection />
       </main>
       <Footer />
+      <SupportChat />
     </div>
   )
 }
