@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import Icon from "@/components/ui/icon"
 
 const VK_URL = "https://vk.com/public201098608"
+const DONATE_URL = "https://pay.cloudtips.ru/p/76ad6c3d"
 
 type Message = {
   id: number
@@ -153,8 +154,20 @@ export function SupportChat() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Donate banner */}
+            <div className="px-4 py-2 bg-[#0d0d1a] border-t border-yellow-500/20">
+              <a
+                href={DONATE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-1.5 rounded-xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-semibold hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
+              >
+                <span>❤️</span> Поддержать автора — CloudTips
+              </a>
+            </div>
+
             {/* Quick replies */}
-            <div className="px-4 py-2 bg-[#0d0d1a] border-t border-purple-500/10 flex gap-2 overflow-x-auto">
+            <div className="px-4 py-2 bg-[#0d0d1a] flex gap-2 overflow-x-auto">
               {["Купить видео", "Форум Dragon", "Возврат"].map((q) => (
                 <button
                   key={q}
