@@ -1,0 +1,11 @@
+
+CREATE TABLE IF NOT EXISTS dragon_members (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  vk_link VARCHAR(200),
+  tg_link VARCHAR(200),
+  role VARCHAR(100) NOT NULL DEFAULT 'Участник',
+  is_moderator BOOLEAN NOT NULL DEFAULT FALSE,
+  note TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

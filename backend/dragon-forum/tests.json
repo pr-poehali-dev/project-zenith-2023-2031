@@ -31,6 +31,22 @@
       "expectedStatus": 200,
       "expectedBody": {"answered": false},
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Список участников",
+      "method": "GET",
+      "path": "/?kind=members&action=list",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Добавить участника",
+      "method": "POST",
+      "path": "/?kind=members&action=create",
+      "body": {"name": "Тест Участник", "role": "Модератор", "is_moderator": true},
+      "expectedStatus": 200,
+      "expectedBody": {"name": "Тест Участник", "is_moderator": true},
+      "bodyMatcher": "partial"
     }
   ]
 }

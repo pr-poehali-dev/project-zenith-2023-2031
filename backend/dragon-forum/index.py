@@ -5,7 +5,7 @@ from urllib.parse import urlparse, unquote
 
 CORS = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
 }
 
@@ -20,7 +20,6 @@ def get_conn():
     )
 
 def esc(val):
-    """Экранирование строки для Simple Query Protocol."""
     return "'" + str(val).replace("'", "''") + "'"
 
 def row_to_dict(row, cols):
@@ -31,7 +30,7 @@ def row_to_dict(row, cols):
     return d
 
 def handler(event: dict, context) -> dict:
-    """API форума Carnival Dragon — вопросы и заявки."""
+    """API форума Carnival Dragon — вопросы, заявки, участники и роли."""
 
     if event.get("httpMethod") == "OPTIONS":
         return {"statusCode": 200, "headers": CORS, "body": ""}
@@ -41,11 +40,91 @@ def handler(event: dict, context) -> dict:
     kind = params.get("kind", "questions")
     action = params.get("action", "list")
 
-    table = "dragon_questions" if kind == "questions" else "dragon_requests"
-
     conn = get_conn()
 
-    # GET — список записей
+    # ── MEMBERS (kind=members) ──────────────────────────────────────────────
+    if kind == "members":
+
+        # GET list
+        if method == "GET" and action == "list":
+            rows = conn.run(
+                "SELECT id, name, vk_link, tg_link, role, is_moderator, note, "
+                "to_char(created_at, 'DD Mon YYYY') as date "
+                "FROM dragon_members ORDER BY is_moderator DESC, created_at DESC"
+            )
+            cols = [c["name"] for c in conn.columns]
+            conn.close()
+            return {"statusCode": 200, "headers": CORS,
+                    "body": json.dumps([row_to_dict(r, cols) for r in rows], ensure_ascii=False)}
+
+        body = json.loads(event.get("body") or "{}")
+
+        # POST create
+        if method == "POST" and action == "create":
+            name = (body.get("name") or "").strip()[:100]
+            if not name:
+                conn.close()
+                return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "name required"})}
+            role = (body.get("role") or "Участник").strip()[:100]
+            vk = (body.get("vk_link") or "").strip()[:200]
+            tg = (body.get("tg_link") or "").strip()[:200]
+            note = (body.get("note") or "").strip()
+            is_mod = "TRUE" if body.get("is_moderator") else "FALSE"
+            sql = (
+                f"INSERT INTO dragon_members (name, vk_link, tg_link, role, is_moderator, note) "
+                f"VALUES ({esc(name)}, {esc(vk)}, {esc(tg)}, {esc(role)}, {is_mod}, {esc(note)}) "
+                f"RETURNING id, name, vk_link, tg_link, role, is_moderator, note, "
+                f"to_char(created_at, 'DD Mon YYYY') as date"
+            )
+            rows = conn.run(sql)
+            cols = [c["name"] for c in conn.columns]
+            conn.close()
+            return {"statusCode": 200, "headers": CORS,
+                    "body": json.dumps(row_to_dict(rows[0], cols), ensure_ascii=False)}
+
+        # PUT update (role / moderator flag)
+        if method == "PUT" and action == "update":
+            member_id = int(body.get("id", 0))
+            if not member_id:
+                conn.close()
+                return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "id required"})}
+            role = (body.get("role") or "Участник").strip()[:100]
+            vk = (body.get("vk_link") or "").strip()[:200]
+            tg = (body.get("tg_link") or "").strip()[:200]
+            note = (body.get("note") or "").strip()
+            is_mod = "TRUE" if body.get("is_moderator") else "FALSE"
+            sql = (
+                f"UPDATE dragon_members SET role={esc(role)}, vk_link={esc(vk)}, tg_link={esc(tg)}, "
+                f"note={esc(note)}, is_moderator={is_mod} "
+                f"WHERE id={member_id} "
+                f"RETURNING id, name, vk_link, tg_link, role, is_moderator, note, "
+                f"to_char(created_at, 'DD Mon YYYY') as date"
+            )
+            rows = conn.run(sql)
+            cols = [c["name"] for c in conn.columns]
+            conn.close()
+            if not rows:
+                return {"statusCode": 404, "headers": CORS, "body": json.dumps({"error": "not found"})}
+            return {"statusCode": 200, "headers": CORS,
+                    "body": json.dumps(row_to_dict(rows[0], cols), ensure_ascii=False)}
+
+        # DELETE remove
+        if method == "DELETE" and action == "delete":
+            body = json.loads(event.get("body") or "{}")
+            member_id = int(body.get("id", 0))
+            if not member_id:
+                conn.close()
+                return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "id required"})}
+            conn.run(f"DELETE FROM dragon_members WHERE id={member_id}")
+            conn.close()
+            return {"statusCode": 200, "headers": CORS, "body": json.dumps({"ok": True})}
+
+        conn.close()
+        return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "unknown members action"})}
+
+    # ── QUESTIONS / REQUESTS ────────────────────────────────────────────────
+    table = "dragon_questions" if kind == "questions" else "dragon_requests"
+
     if method == "GET" and action == "list":
         rows = conn.run(
             f"SELECT id, author, avatar, text, answer, answered, "
@@ -59,21 +138,16 @@ def handler(event: dict, context) -> dict:
 
     body = json.loads(event.get("body") or "{}")
 
-    # POST — создать вопрос/заявку
     if method == "POST" and action == "create":
         author = (body.get("author") or "").strip()[:100]
         text = (body.get("text") or "").strip()
         if not author or not text:
             conn.close()
             return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "author and text required"})}
-
         initials = "".join(w[0].upper() for w in author.split() if w)[:2]
-
         if kind == "requests":
-            cnt_rows = conn.run(f"SELECT COUNT(*) FROM {table}")
-            cnt = cnt_rows[0][0]
+            cnt = conn.run(f"SELECT COUNT(*) FROM {table}")[0][0]
             text = f"Заявка #{str(cnt + 1).zfill(3)} — {text}"
-
         sql = (
             f"INSERT INTO {table} (author, avatar, text) "
             f"VALUES ({esc(author)}, {esc(initials)}, {esc(text)}) "
@@ -83,16 +157,15 @@ def handler(event: dict, context) -> dict:
         rows = conn.run(sql)
         cols = [c["name"] for c in conn.columns]
         conn.close()
-        return {"statusCode": 200, "headers": CORS, "body": json.dumps(row_to_dict(rows[0], cols), ensure_ascii=False)}
+        return {"statusCode": 200, "headers": CORS,
+                "body": json.dumps(row_to_dict(rows[0], cols), ensure_ascii=False)}
 
-    # PUT — добавить ответ
     if method == "PUT" and action == "answer":
         record_id = body.get("id")
         answer = (body.get("answer") or "").strip()
         if not record_id or not answer:
             conn.close()
             return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "id and answer required"})}
-
         sql = (
             f"UPDATE {table} SET answer={esc(answer)}, answered=TRUE "
             f"WHERE id={int(record_id)} "
@@ -104,7 +177,8 @@ def handler(event: dict, context) -> dict:
         conn.close()
         if not rows:
             return {"statusCode": 404, "headers": CORS, "body": json.dumps({"error": "not found"})}
-        return {"statusCode": 200, "headers": CORS, "body": json.dumps(row_to_dict(rows[0], cols), ensure_ascii=False)}
+        return {"statusCode": 200, "headers": CORS,
+                "body": json.dumps(row_to_dict(rows[0], cols), ensure_ascii=False)}
 
     conn.close()
     return {"statusCode": 400, "headers": CORS, "body": json.dumps({"error": "unknown action"})}
