@@ -25,8 +25,8 @@ export function Navbar() {
               <a href="#catalog" className="font-geist text-gray-300 hover:text-purple-400 transition-colors duration-200">
                 Каталог видео
               </a>
-              <a href="#forum" className="font-geist text-gray-300 hover:text-blue-400 transition-colors duration-200">
-                Carnival Dragon
+              <a href="#forum" className="font-geist text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center gap-1">
+                🐉 Carnival Dragon
               </a>
               <a href="#faq" className="font-geist text-gray-300 hover:text-orange-400 transition-colors duration-200">
                 FAQ
@@ -68,7 +68,7 @@ export function Navbar() {
                 className="block px-3 py-2 font-geist text-gray-300 hover:text-blue-400 transition-colors duration-200"
                 onClick={() => setIsOpen(false)}
               >
-                Carnival Dragon
+                🐉 Carnival Dragon
               </a>
               <a
                 href="#faq"

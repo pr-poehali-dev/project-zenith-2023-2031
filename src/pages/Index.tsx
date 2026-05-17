@@ -7,6 +7,7 @@ import { SafetySection } from "@/components/safety-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { FAQSection } from "@/components/faq-section"
 import { CTASection } from "@/components/cta-section"
+import { DragonForum } from "@/components/dragon-forum"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { SupportChat } from "@/components/support-chat"
@@ -27,6 +28,7 @@ export default function Index() {
           <SafetySection />
         </section>
         <TestimonialsSection />
+        <DragonForum />
         <section id="faq">
           <FAQSection />
         </section>
