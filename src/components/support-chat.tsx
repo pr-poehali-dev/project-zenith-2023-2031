@@ -1,53 +1,28 @@
 import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import Icon from "@/components/ui/icon"
-
-const VK_URL = "https://vk.com/public201098608"
-const DONATE_URL = "https://pay.cloudtips.ru/p/76ad6c3d"
 
 type Message = {
   id: number
   text: string
   isBot: boolean
-  isEscalated?: boolean
+  videoUrl?: string
+  isVideo?: boolean
 }
 
-const FAQ_ANSWERS: Record<string, string> = {
-  "купить": "Чтобы купить видео: найдите его в каталоге → нажмите «Купить» → оплатите → доступ откроется мгновенно в личном кабинете! 🎬",
-  "оплата": "Принимаем банковские карты и популярные платёжные системы. После оплаты доступ появляется сразу! 💳",
-  "доступ": "Доступ к купленным видео сохраняется навсегда — смотрите в любое удобное время в личном кабинете. ♾️",
-  "форум": "Carnival Dragon — наш форум, где команда отвечает на вопросы и публикует анонсы новинок. Загляните! 🐉",
-  "возврат": "Каждый случай рассматриваем индивидуально. Опишите ситуацию подробнее, и мы разберёмся! 🤝",
-  "видео": "В каталоге Carnival Pantera — эксклюзивный контент, которого нет больше нигде. Новинки появляются регулярно! ⭐",
-  "новинки": "Все анонсы новинок публикуются первыми на форуме Carnival Dragon — не пропустите! 🔥",
-  "пароль": "Для сброса пароля воспользуйтесь кнопкой «Забыли пароль?» на странице входа. Письмо придёт на вашу почту. 📧",
-  "регистрация": "Регистрация простая: укажите email, придумайте пароль — и вы уже в системе! Занимает меньше минуты. ✅",
-  "привет": "Привет! 👋 Я чат-бот техподдержки Carnival Pantera. Чем могу помочь? Спросите про покупку видео, форум Dragon или что-то другое!",
-  "здравствуй": "Здравствуйте! 👋 Я здесь, чтобы помочь с вопросами о Carnival Pantera. Что вас интересует?",
-  "помощь": "Я помогу с вопросами о покупках, доступе к видео, форуме Carnival Dragon и платёжными вопросами. Что именно вас интересует? 🛠️",
-  "спасибо": "Рад помочь! 😊 Если появятся ещё вопросы — я здесь. Приятного просмотра на Carnival Pantera! 🎬",
+function isVideoLink(text: string): boolean {
+  return /https?:\/\/.*(youtube|youtu\.be|vimeo|rutube|tiktok|ok\.ru\/video|vk\.com\/video)/i.test(text)
 }
 
-function getBotResponse(userText: string): { text: string; isEscalated?: boolean } {
-  const lower = userText.toLowerCase()
-  for (const [keyword, answer] of Object.entries(FAQ_ANSWERS)) {
-    if (lower.includes(keyword)) return { text: answer }
-  }
-  return {
-    text: "Этот вопрос я передаю напрямую автору — он ответит лично! Нажмите кнопку ниже, чтобы написать во ВКонтакте. 👇",
-    isEscalated: true,
-  }
+function extractVideoEmbed(url: string): string | null {
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`
+  return null
 }
 
 export function SupportChat() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Привет! 👋 Я чат-бот техподдержки Carnival Pantera. Спросите про покупку видео, форум Carnival Dragon или что-то другое!",
-      isBot: true,
-    },
+    { id: 1, text: "Привет! 👋 Я чат Carnival Pantera. Пишите ваш вопрос, кидайте ссылки на видео — мы всё посмотрим и ответим!", isBot: true },
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -58,48 +33,61 @@ export function SupportChat() {
   }, [messages, isTyping])
 
   const sendMessage = (text?: string) => {
-    const msgText = text ?? input
-    if (!msgText.trim()) return
+    const msgText = (text ?? input).trim()
+    if (!msgText) return
 
-    const userMsg: Message = { id: Date.now(), text: msgText, isBot: false }
-    setMessages((prev) => [...prev, userMsg])
+    const isVid = isVideoLink(msgText)
+    const userMsg: Message = { id: Date.now(), text: msgText, isBot: false, isVideo: isVid, videoUrl: isVid ? msgText : undefined }
+    setMessages(prev => [...prev, userMsg])
     setInput("")
     setIsTyping(true)
 
     setTimeout(() => {
-      const { text: botText, isEscalated } = getBotResponse(msgText)
       setIsTyping(false)
-      setMessages((prev) => [...prev, { id: Date.now() + 1, text: botText, isBot: true, isEscalated }])
-    }, 900)
-  }
+      let botText = "Ваше сообщение получено! ✅ Мы ответим вам в ближайшее время."
+      if (isVid) botText = "Видео получено! 🎬 Мы посмотрим его и свяжемся с вами по вашему вопросу."
+      else if (msgText.toLowerCase().includes("купить")) botText = "Для покупки — выберите товар в каталоге и нажмите кнопку «Купить». Остались вопросы — напишите! 🛒"
+      else if (msgText.toLowerCase().includes("заявк")) botText = "Заявку можно подать в разделе «Заявки» на сайте. Там же — алкоголь, вейпы и табак (18+). 📝"
+      else if (msgText.toLowerCase().includes("привет") || msgText.toLowerCase().includes("здравствуй")) botText = "Здравствуйте! 👋 Чем могу помочь?"
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") sendMessage()
-  }
-
-  const handleQuickReply = (q: string) => {
-    sendMessage(q)
+      setMessages(prev => [...prev, { id: Date.now() + 1, text: botText, isBot: true }])
+    }, 800)
   }
 
   return (
     <>
-      {/* Chat Window */}
+      {/* Floating button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-6 z-[9997] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 neon-button-primary"
+        style={{ boxShadow: "0 0 20px rgba(168,85,247,0.5)" }}>
+        {isOpen ? <Icon name="X" size={22} /> : <Icon name="MessageCircle" size={24} />}
+      </button>
+
+      {/* Chat window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-[9998] w-80 sm:w-96 chat-pop">
-          <div className="bg-[#0d0d1a] border border-purple-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col" style={{ height: 460 }}>
+        <div className="fixed bottom-24 right-6 z-[9996] w-80 sm:w-96 chat-pop">
+          <div className="bg-[#0d0d1a] border border-purple-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            style={{ height: 480, boxShadow: "0 0 40px rgba(168,85,247,0.2)" }}>
             {/* Header */}
-            <div className="carnival-gradient-bg px-4 py-3 flex items-center justify-between">
+            <div className="px-4 py-3 flex items-center justify-between"
+              style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.3), rgba(59,130,246,0.3))", borderBottom: "1px solid rgba(168,85,247,0.2)" }}>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-base">🎪</div>
+                <img
+                  src="https://cdn.poehali.dev/projects/3d74854d-9358-4a23-8c6e-df0850b2ae4f/bucket/393248e3-d91b-458e-8812-026d76f4809e.jpg"
+                  alt="CP"
+                  className="w-8 h-8 rounded-full object-cover"
+                  style={{ boxShadow: "0 0 8px rgba(168,85,247,0.5)" }}
+                />
                 <div>
-                  <p className="text-white font-semibold text-sm font-orbitron">Техподдержка</p>
-                  <p className="text-white/70 text-xs">Carnival Pantera</p>
+                  <p className="text-white font-semibold text-sm font-orbitron">Чат поддержки</p>
+                  <p className="text-purple-300/70 text-xs">Carnival Pantera</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span className="text-white/70 text-xs">Онлайн</span>
-                <button onClick={() => setIsOpen(false)} className="text-white/70 hover:text-white ml-2">
+                <span className="w-2 h-2 bg-green-400 rounded-full" style={{ boxShadow: "0 0 6px rgba(74,222,128,0.8)" }} />
+                <span className="text-white/60 text-xs">Онлайн</span>
+                <button onClick={() => setIsOpen(false)} className="text-white/50 hover:text-white ml-1 transition-colors">
                   <Icon name="X" size={16} />
                 </button>
               </div>
@@ -107,46 +95,56 @@ export function SupportChat() {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-[#0d0d1a]">
-              {messages.map((msg) => (
+              {messages.map(msg => (
                 <div key={msg.id} className={`flex flex-col ${msg.isBot ? "items-start" : "items-end"}`}>
                   <div className={`flex ${msg.isBot ? "justify-start" : "justify-end"} w-full`}>
                     {msg.isBot && (
-                      <div className="w-6 h-6 rounded-full carnival-gradient-bg flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1">
-                        🎪
-                      </div>
+                      <img src="https://cdn.poehali.dev/projects/3d74854d-9358-4a23-8c6e-df0850b2ae4f/bucket/393248e3-d91b-458e-8812-026d76f4809e.jpg"
+                        alt="CP" className="w-6 h-6 rounded-full object-cover mr-2 flex-shrink-0 mt-1" />
                     )}
-                    <div
-                      className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
-                        msg.isBot
-                          ? "bg-[#1a1a2e] text-gray-200 rounded-tl-sm"
-                          : "carnival-gradient-bg text-white rounded-tr-sm"
-                      }`}
-                    >
-                      {msg.text}
+                    <div className={`max-w-[75%] ${msg.isVideo ? "w-full" : ""}`}>
+                      {msg.isVideo && msg.videoUrl ? (
+                        <div className="rounded-2xl overflow-hidden border border-purple-500/30">
+                          {extractVideoEmbed(msg.videoUrl) ? (
+                            <iframe
+                              src={extractVideoEmbed(msg.videoUrl)!}
+                              className="w-full"
+                              height="150"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              title="video"
+                            />
+                          ) : (
+                            <a href={msg.videoUrl} target="_blank" rel="noopener noreferrer"
+                              className="block px-3 py-2 bg-purple-500/10 rounded-2xl text-purple-300 text-sm hover:bg-purple-500/20 transition-colors">
+                              🎬 Видео: {msg.videoUrl.slice(0, 40)}...
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                          msg.isBot
+                            ? "bg-[#1a1a2e] text-gray-200 rounded-tl-sm"
+                            : "text-white rounded-tr-sm"
+                        }`}
+                          style={!msg.isBot ? { background: "linear-gradient(135deg, rgba(168,85,247,0.4), rgba(59,130,246,0.4))", border: "1px solid rgba(168,85,247,0.3)" } : {}}>
+                          {msg.text}
+                        </div>
+                      )}
                     </div>
                   </div>
-                  {msg.isEscalated && (
-                    <a
-                      href={VK_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-8 mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0077FF] hover:bg-[#0060CC] text-white text-xs font-semibold transition-colors"
-                    >
-                      <span>💬</span> Написать во ВКонтакте
-                    </a>
-                  )}
                 </div>
               ))}
+
               {isTyping && (
-                <div className="flex justify-start">
-                  <div className="w-6 h-6 rounded-full carnival-gradient-bg flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1">
-                    🎪
-                  </div>
+                <div className="flex items-center gap-2">
+                  <img src="https://cdn.poehali.dev/projects/3d74854d-9358-4a23-8c6e-df0850b2ae4f/bucket/393248e3-d91b-458e-8812-026d76f4809e.jpg"
+                    alt="CP" className="w-6 h-6 rounded-full object-cover" />
                   <div className="bg-[#1a1a2e] px-4 py-3 rounded-2xl rounded-tl-sm">
                     <div className="flex gap-1">
                       <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                       <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                   </div>
                 </div>
@@ -154,65 +152,36 @@ export function SupportChat() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Donate banner */}
-            <div className="px-4 py-2 bg-[#0d0d1a] border-t border-yellow-500/20">
-              <a
-                href={DONATE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-1.5 rounded-xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-semibold hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
-              >
-                <span>❤️</span> Поддержать автора — CloudTips
-              </a>
-            </div>
-
             {/* Quick replies */}
-            <div className="px-4 py-2 bg-[#0d0d1a] flex gap-2 overflow-x-auto">
-              {["Купить видео", "Форум Dragon", "Возврат"].map((q) => (
-                <button
-                  key={q}
-                  onClick={() => handleQuickReply(q)}
-                  className="flex-shrink-0 text-xs px-3 py-1 rounded-full border border-purple-500/30 text-purple-300 hover:bg-purple-500/10 transition-colors whitespace-nowrap"
-                >
+            <div className="px-4 py-2 bg-[#0d0d1a] flex gap-2 overflow-x-auto border-t border-white/5">
+              {["Купить аккаунт", "Подать заявку", "Рулетка"].map(q => (
+                <button key={q} onClick={() => sendMessage(q)}
+                  className="flex-shrink-0 text-xs px-3 py-1 rounded-full border border-purple-500/30 text-purple-300 hover:bg-purple-500/10 transition-colors whitespace-nowrap">
                   {q}
                 </button>
               ))}
             </div>
 
             {/* Input */}
-            <div className="px-4 py-3 bg-[#0d0d1a] border-t border-purple-500/10 flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Напишите вопрос..."
-                className="bg-[#1a1a2e] border-purple-500/30 text-white placeholder:text-gray-500 focus:border-purple-400 text-sm"
-              />
-              <Button
-                onClick={() => sendMessage()}
-                size="sm"
-                className="carnival-gradient-bg hover:opacity-90 border-0 px-3"
-                disabled={!input.trim()}
-              >
-                <Icon name="Send" size={16} />
-              </Button>
+            <div className="px-3 py-3 bg-[#0d0d1a] border-t border-white/5">
+              <div className="flex gap-2 items-center">
+                <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && sendMessage()}
+                  placeholder="Сообщение или ссылка на видео..."
+                  className="flex-1 bg-[#1a1a2e] border border-purple-500/20 rounded-xl px-3 py-2.5 text-white placeholder:text-gray-600 text-sm focus:outline-none focus:border-purple-500/50"
+                />
+                <button onClick={() => sendMessage()}
+                  className="w-10 h-10 rounded-xl neon-button-primary flex items-center justify-center flex-shrink-0">
+                  <Icon name="Send" size={16} />
+                </button>
+              </div>
+              <p className="text-gray-600 text-xs mt-1.5 text-center">Можно кидать ссылки на YouTube, VK Видео, TikTok</p>
             </div>
           </div>
         </div>
       )}
-
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full carnival-gradient-bg shadow-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center"
-        style={{ boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}
-      >
-        {isOpen ? (
-          <Icon name="X" size={22} className="text-white" />
-        ) : (
-          <Icon name="MessageCircle" size={22} className="text-white" />
-        )}
-      </button>
     </>
   )
 }
