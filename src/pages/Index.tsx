@@ -11,6 +11,9 @@ import { OrdersSection } from "@/components/orders-section"
 import { RouletteSection } from "@/components/roulette-section"
 import { RequestsSection } from "@/components/requests-section"
 import { ManagementSection } from "@/components/management-section"
+import { StatsCounter } from "@/components/stats-counter"
+import { ReviewsSection } from "@/components/reviews-section"
+import { TopProducts } from "@/components/top-products"
 
 export default function Index() {
   return (
@@ -18,9 +21,12 @@ export default function Index() {
       <Navbar />
       <main>
         <Hero3D />
+        <StatsCounter />
         <AccountsSection />
         <GamesSection />
+        <TopProducts />
         <MarketSection />
+        <ReviewsSection />
         <OrdersSection />
         <RouletteSection />
         <RequestsSection />

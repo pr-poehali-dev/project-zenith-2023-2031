@@ -7,7 +7,19 @@ type Message = {
   isBot: boolean
   videoUrl?: string
   isVideo?: boolean
+  userName?: string
+  userEmoji?: string
 }
+
+const DEMO_ACTIVITY = [
+  { userName: "Артём К.", userEmoji: "🦊", text: "Только что купил Steam аккаунт — всё пришло мгновенно! 🔥" },
+  { userName: "Настя В.", userEmoji: "🌸", text: "Заказала рекламу своего сервера, уже есть результат!" },
+  { userName: "Макс Д.", userEmoji: "⚡", text: "Выиграл скидку в рулетке 🎰 советую всем крутить!" },
+  { userName: "Лена С.", userEmoji: "💜", text: "Привезли свежие фрукты, очень вкусно 🍎" },
+  { userName: "Дима Р.", userEmoji: "🎮", text: "Discord Nitro получил за 5 минут после оплаты ✅" },
+  { userName: "Алина М.", userEmoji: "🌟", text: "Ребята молодцы! Лучший сайт для покупок 👍" },
+  { userName: "Кирилл Т.", userEmoji: "🔥", text: "Реклама CS2 сработала — +15 новых игроков за неделю!" },
+]
 
 function isVideoLink(text: string): boolean {
   return /https?:\/\/.*(youtube|youtu\.be|vimeo|rutube|tiktok|ok\.ru\/video|vk\.com\/video)/i.test(text)
@@ -26,11 +38,33 @@ export function SupportChat() {
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const [onlineCount, setOnlineCount] = useState(23)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const demoIndexRef = useRef(0)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages, isTyping])
+
+  // Demo activity — случайные сообщения от «пользователей»
+  useEffect(() => {
+    const delays = [4000, 9000, 15000, 22000, 31000, 42000]
+    const timers = delays.map((delay, i) =>
+      setTimeout(() => {
+        const demo = DEMO_ACTIVITY[demoIndexRef.current % DEMO_ACTIVITY.length]
+        demoIndexRef.current += 1
+        setMessages(prev => [...prev, {
+          id: Date.now() + i,
+          text: demo.text,
+          isBot: false,
+          userName: demo.userName,
+          userEmoji: demo.userEmoji,
+        }])
+        setOnlineCount(n => n + Math.floor(Math.random() * 3) - 1)
+      }, delay)
+    )
+    return () => timers.forEach(clearTimeout)
+  }, [])
 
   const sendMessage = (text?: string) => {
     const msgText = (text ?? input).trim()
@@ -86,7 +120,7 @@ export function SupportChat() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-400 rounded-full" style={{ boxShadow: "0 0 6px rgba(74,222,128,0.8)" }} />
-                <span className="text-white/60 text-xs">Онлайн</span>
+                <span className="text-green-300 text-xs font-semibold">{onlineCount} онлайн</span>
                 <button onClick={() => setIsOpen(false)} className="text-white/50 hover:text-white ml-1 transition-colors">
                   <Icon name="X" size={16} />
                 </button>
@@ -96,43 +130,61 @@ export function SupportChat() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-[#0d0d1a]">
               {messages.map(msg => (
-                <div key={msg.id} className={`flex flex-col ${msg.isBot ? "items-start" : "items-end"}`}>
-                  <div className={`flex ${msg.isBot ? "justify-start" : "justify-end"} w-full`}>
-                    {msg.isBot && (
-                      <img src="https://cdn.poehali.dev/projects/3d74854d-9358-4a23-8c6e-df0850b2ae4f/bucket/393248e3-d91b-458e-8812-026d76f4809e.jpg"
-                        alt="CP" className="w-6 h-6 rounded-full object-cover mr-2 flex-shrink-0 mt-1" />
-                    )}
-                    <div className={`max-w-[75%] ${msg.isVideo ? "w-full" : ""}`}>
-                      {msg.isVideo && msg.videoUrl ? (
-                        <div className="rounded-2xl overflow-hidden border border-purple-500/30">
-                          {extractVideoEmbed(msg.videoUrl) ? (
-                            <iframe
-                              src={extractVideoEmbed(msg.videoUrl)!}
-                              className="w-full"
-                              height="150"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              title="video"
-                            />
-                          ) : (
-                            <a href={msg.videoUrl} target="_blank" rel="noopener noreferrer"
-                              className="block px-3 py-2 bg-purple-500/10 rounded-2xl text-purple-300 text-sm hover:bg-purple-500/20 transition-colors">
-                              🎬 Видео: {msg.videoUrl.slice(0, 40)}...
-                            </a>
-                          )}
-                        </div>
-                      ) : (
-                        <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
-                          msg.isBot
-                            ? "bg-[#1a1a2e] text-gray-200 rounded-tl-sm"
-                            : "text-white rounded-tr-sm"
-                        }`}
-                          style={!msg.isBot ? { background: "linear-gradient(135deg, rgba(168,85,247,0.4), rgba(59,130,246,0.4))", border: "1px solid rgba(168,85,247,0.3)" } : {}}>
+                <div key={msg.id} className={`flex flex-col ${msg.isBot || msg.userName ? "items-start" : "items-end"}`}>
+                  {/* Demo user message */}
+                  {msg.userName && (
+                    <div className="flex items-start gap-2 w-full">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                        {msg.userEmoji}
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-purple-300 text-xs font-semibold">{msg.userName}</span>
+                        <div className="bg-[#1e1e35] border border-purple-500/20 px-3 py-2 rounded-2xl rounded-tl-sm text-gray-200 text-sm leading-relaxed mt-0.5">
                           {msg.text}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Bot or self message */}
+                  {!msg.userName && (
+                    <div className={`flex ${msg.isBot ? "justify-start" : "justify-end"} w-full`}>
+                      {msg.isBot && (
+                        <img src="https://cdn.poehali.dev/projects/3d74854d-9358-4a23-8c6e-df0850b2ae4f/bucket/393248e3-d91b-458e-8812-026d76f4809e.jpg"
+                          alt="CP" className="w-6 h-6 rounded-full object-cover mr-2 flex-shrink-0 mt-1" />
+                      )}
+                      <div className={`max-w-[75%] ${msg.isVideo ? "w-full" : ""}`}>
+                        {msg.isVideo && msg.videoUrl ? (
+                          <div className="rounded-2xl overflow-hidden border border-purple-500/30">
+                            {extractVideoEmbed(msg.videoUrl) ? (
+                              <iframe
+                                src={extractVideoEmbed(msg.videoUrl)!}
+                                className="w-full"
+                                height="150"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title="video"
+                              />
+                            ) : (
+                              <a href={msg.videoUrl} target="_blank" rel="noopener noreferrer"
+                                className="block px-3 py-2 bg-purple-500/10 rounded-2xl text-purple-300 text-sm hover:bg-purple-500/20 transition-colors">
+                                🎬 Видео: {msg.videoUrl.slice(0, 40)}...
+                              </a>
+                            )}
+                          </div>
+                        ) : (
+                          <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                            msg.isBot
+                              ? "bg-[#1a1a2e] text-gray-200 rounded-tl-sm"
+                              : "text-white rounded-tr-sm"
+                          }`}
+                            style={!msg.isBot ? { background: "linear-gradient(135deg, rgba(168,85,247,0.4), rgba(59,130,246,0.4))", border: "1px solid rgba(168,85,247,0.3)" } : {}}>
+                            {msg.text}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
 
