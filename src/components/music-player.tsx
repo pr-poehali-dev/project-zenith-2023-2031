@@ -3,6 +3,10 @@ import Icon from "@/components/ui/icon"
 
 const JAMENDO_URL = "https://functions.poehali.dev/c04270b8-f8fc-4f9c-bafc-dfed5d06202f"
 
+const EXTRA_TRACKS = [
+  { id: "custom-1", title: "Мальборо", artist: "SAYAN", src: "https://cdn12.deliciousoranges.com/s1/get/music/20260410/SAYAN_-_Malboro_81251971.mp3", duration: "3:15" },
+]
+
 type Track = {
   id: number | string
   title: string
@@ -25,7 +29,10 @@ export function MusicPlayer() {
     setLoading(true)
     fetch(JAMENDO_URL)
       .then(r => r.json())
-      .then(data => { if (data.tracks?.length) setTracks(data.tracks) })
+      .then(data => {
+        const remote = data.tracks?.length ? data.tracks : []
+        setTracks([...EXTRA_TRACKS, ...remote])
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
