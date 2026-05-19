@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "Get Jamendo tracks",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {"tracks": []},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
