@@ -5,6 +5,8 @@ const JAMENDO_URL = "https://functions.poehali.dev/c04270b8-f8fc-4f9c-bafc-dfed5
 
 const EXTRA_TRACKS = [
   { id: "custom-1", title: "Мальборо", artist: "SAYAN", src: "https://cdn12.deliciousoranges.com/s1/get/music/20260410/SAYAN_-_Malboro_81251971.mp3", duration: "3:15" },
+  { id: "custom-2", title: "Прыгну со скалы", artist: "Король и Шут", src: "https://cdn17.deliciousoranges.com/s1/get/music/20190305/Korol_i_SHut_-_Prygnu_so_skaly_62570549.mp3", duration: "3:30" },
+  { id: "custom-3", title: "Закрой мои глаза", artist: "SAYAN", src: "https://cdn14.deliciousoranges.com/s1/get/music/20260224/SAYAN_-_Zakrojj_moi_glaza_80927080.mp3", duration: "3:20" },
 ]
 
 type Track = {
