@@ -10,10 +10,12 @@ type Track = {
 }
 
 const TRACKS: Track[] = [
-  { id: 1, title: "Neon Pantera", artist: "Carnival Beats", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", duration: "3:45" },
-  { id: 2, title: "Purple Neon", artist: "Night Carnival", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", duration: "4:12" },
-  { id: 3, title: "Cyber Pantera", artist: "Digital Wild", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", duration: "3:58" },
+  { id: 1, title: "Dope Dance Remix", artist: "Прайм", src: "", duration: "3:30" },
+  { id: 2, title: "Мальборо", artist: "SAYAN, Brooklyn", src: "", duration: "3:15" },
+  { id: 3, title: "Miyagi & Andy Panda", artist: "TumaniYO", src: "", duration: "4:00" },
 ]
+
+// 🎵 Чтобы добавить музыку — вставьте прямые ссылки на MP3 в поле src выше
 
 export function MusicPlayer() {
   const [isOpen, setIsOpen] = useState(false)
@@ -21,6 +23,7 @@ export function MusicPlayer() {
   const [currentTrack, setCurrentTrack] = useState(0)
   const [progress, setProgress] = useState(0)
   const [volume, setVolume] = useState(0.5)
+  const [noSrc, setNoSrc] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
@@ -47,12 +50,14 @@ export function MusicPlayer() {
   const togglePlay = () => {
     const audio = audioRef.current
     if (!audio) return
+    if (!TRACKS[currentTrack].src) { setNoSrc(true); setTimeout(() => setNoSrc(false), 3000); return }
     if (isPlaying) { audio.pause(); setIsPlaying(false) }
     else { audio.play().then(() => setIsPlaying(true)).catch(() => {}) }
   }
 
   const changeTrack = (idx: number) => {
     setCurrentTrack(idx)
+    if (!TRACKS[idx].src) return
     setIsPlaying(true)
     setTimeout(() => audioRef.current?.play().catch(() => {}), 100)
   }
@@ -85,6 +90,13 @@ export function MusicPlayer() {
                 <Icon name="X" size={16} />
               </button>
             </div>
+
+            {/* No src hint */}
+            {noSrc && (
+              <div className="mb-3 px-3 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-yellow-300 text-xs text-center">
+                Вставьте ссылку на MP3 в код плеера
+              </div>
+            )}
 
             {/* Progress */}
             <input type="range" min="0" max="100" value={progress} onChange={seek}

@@ -14,6 +14,7 @@ import { ManagementSection } from "@/components/management-section"
 import { StatsCounter } from "@/components/stats-counter"
 import { ReviewsSection } from "@/components/reviews-section"
 import { TopProducts } from "@/components/top-products"
+import { VideoReview } from "@/components/video-review"
 
 export default function Index() {
   return (
@@ -25,6 +26,7 @@ export default function Index() {
         <AccountsSection />
         <GamesSection />
         <TopProducts />
+        <VideoReview />
         <MarketSection />
         <ReviewsSection />
         <OrdersSection />
