@@ -267,6 +267,24 @@ export default function Admin() {
             )}
           </>
         )}
+
+        {/* Publish passwords info */}
+        <div className="mt-10 p-5 bg-[#0d0d1a] rounded-2xl border border-yellow-500/20">
+          <p className="text-yellow-300 font-semibold text-sm flex items-center gap-2 mb-3">
+            <Icon name="Lock" size={15} /> Пароли для публикации на сайте
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between bg-black/30 px-4 py-2.5 rounded-xl">
+              <span className="text-gray-400 text-sm">Владелец</span>
+              <code className="text-yellow-300 text-sm font-mono bg-yellow-500/10 px-2 py-0.5 rounded">owner2025</code>
+            </div>
+            <div className="flex items-center justify-between bg-black/30 px-4 py-2.5 rounded-xl">
+              <span className="text-gray-400 text-sm">Директор</span>
+              <code className="text-purple-300 text-sm font-mono bg-purple-500/10 px-2 py-0.5 rounded">director2025</code>
+            </div>
+          </div>
+          <p className="text-gray-600 text-xs mt-3">Введите пароль при нажатии кнопок «Опубликовать» и «Разместить» на сайте.</p>
+        </div>
       </div>
     </div>
   )

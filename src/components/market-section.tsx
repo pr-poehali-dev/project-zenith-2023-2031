@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Icon from "@/components/ui/icon"
+import { usePublishAuth } from "@/components/publish-auth"
 
 type Product = {
   id: number
@@ -26,6 +27,7 @@ const INITIAL_PRODUCTS: Product[] = [
 ]
 
 export function MarketSection() {
+  const { requestPublishAuth } = usePublishAuth()
   const [products] = useState<Product[]>(INITIAL_PRODUCTS)
   const [filter, setFilter] = useState("Все")
   const [showAddForm, setShowAddForm] = useState(false)
@@ -107,11 +109,12 @@ export function MarketSection() {
         </div>
 
         <div className="text-center">
-          <button onClick={() => setShowAddForm(true)}
+          <button onClick={() => requestPublishAuth(() => setShowAddForm(true))}
             className="inline-flex items-center gap-2 px-8 py-3 rounded-2xl border border-green-500/40 text-green-300 font-semibold hover:bg-green-500/10 hover:border-green-500/70 transition-all"
             style={{ boxShadow: "0 0 15px rgba(34,197,94,0.15)" }}>
             <Icon name="Plus" size={18} />
             Разместить объявление
+            <Icon name="Lock" size={14} className="opacity-60" />
           </button>
         </div>
 

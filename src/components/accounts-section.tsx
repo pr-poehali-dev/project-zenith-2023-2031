@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Icon from "@/components/ui/icon"
+import { usePublishAuth } from "@/components/publish-auth"
 
 type Account = {
   id: number
@@ -21,6 +22,7 @@ const INITIAL_ACCOUNTS: Account[] = [
 ]
 
 export function AccountsSection() {
+  const { requestPublishAuth } = usePublishAuth()
   const [accounts] = useState<Account[]>(INITIAL_ACCOUNTS)
   const [filter, setFilter] = useState("Все")
   const [showForm, setShowForm] = useState(false)
@@ -98,10 +100,11 @@ export function AccountsSection() {
 
         {/* Sell button */}
         <div className="text-center">
-          <button onClick={() => setShowForm(true)}
+          <button onClick={() => requestPublishAuth(() => setShowForm(true))}
             className="neon-button-primary px-8 py-3 rounded-2xl text-white font-semibold inline-flex items-center gap-2">
             <Icon name="Plus" size={18} />
             Опубликовать свой аккаунт
+            <Icon name="Lock" size={14} className="opacity-60" />
           </button>
         </div>
 
