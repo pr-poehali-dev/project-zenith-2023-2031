@@ -15,8 +15,8 @@ type Manager = {
 }
 
 const MANAGERS: Manager[] = [
-  { id: 1, name: "Александр В.", role: "Владелец", avatar: "👑", stars: 5, points: 9850, reviews: 142, specialty: "Общее руководство, стратегия", vk: "https://vk.com", tg: "https://t.me" },
-  { id: 2, name: "Мария С.", role: "Директор", avatar: "💎", stars: 5, points: 7200, reviews: 89, specialty: "Продажи аккаунтов, работа с клиентами", tg: "https://t.me" },
+  { id: 1, name: "Ренат П.", role: "Владелец", avatar: "👑", stars: 5, points: 9850, reviews: 142, specialty: "Общее руководство, стратегия", vk: "https://vk.com/renatplatonov" },
+  { id: 2, name: "Директор", role: "Директор", avatar: "💎", stars: 5, points: 7200, reviews: 89, specialty: "Продажи аккаунтов, работа с клиентами", tg: "https://t.me/live_your_life_with_worthiness" },
   { id: 3, name: "Денис К.", role: "Руководитель", avatar: "🔥", stars: 4, points: 5400, reviews: 67, specialty: "Игровые проекты, реклама", vk: "https://vk.com" },
   { id: 4, name: "Екатерина Л.", role: "Администрация", avatar: "⭐", stars: 4, points: 3800, reviews: 45, specialty: "Маркет, продукция", tg: "https://t.me" },
   { id: 5, name: "Роман Т.", role: "Модератор", avatar: "🛡️", stars: 5, points: 2900, reviews: 38, specialty: "Безопасность, чёрные списки", vk: "https://vk.com" },
