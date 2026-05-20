@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { AdminPosts } from "@/components/admin/AdminPosts"
 import { AdminMembers } from "@/components/admin/AdminMembers"
 import { AdminBlacklist } from "@/components/admin/AdminBlacklist"
+import { AdminChat } from "@/components/admin/AdminChat"
 import {
   API, ADMIN_PASSWORD,
   type AdminTab, type ForumPost, type Member, type BlacklistEntry,
@@ -46,6 +47,7 @@ export default function Admin() {
   }
 
   const fetchData = useCallback(async (kind: AdminTab) => {
+    if (kind === "chat" || kind === "blacklist" || kind === "bans") return
     setLoading(true)
     try {
       const res = await fetch(`${API}?kind=${kind}&action=list`)
@@ -198,6 +200,7 @@ export default function Admin() {
           {([
             { key: "questions" as AdminTab, label: "Вопросы", icon: "MessageSquare", color: "bg-purple-500/20 text-purple-300" },
             { key: "requests" as AdminTab, label: "Заявки", icon: "ClipboardList", color: "bg-orange-500/20 text-orange-300" },
+            { key: "chat" as AdminTab, label: "Чат", icon: "MessagesSquare", color: "bg-green-500/20 text-green-300" },
             { key: "members" as AdminTab, label: "Участники", icon: "Users", color: "bg-blue-500/20 text-blue-300" },
             { key: "blacklist" as AdminTab, label: "Чёрный список", icon: "UserX", color: "bg-red-500/20 text-red-300" },
             { key: "bans" as AdminTab, label: "Баны", icon: "Ban", color: "bg-red-900/30 text-red-400" },
@@ -212,7 +215,7 @@ export default function Admin() {
 
         <div className="flex justify-between items-center mb-4">
           <p className="text-gray-500 text-sm">
-            {tab === "members" ? `${members.length} участников · ${moderators.length} модераторов` : `${posts.length} записей`}
+            {tab === "members" ? `${members.length} участников · ${moderators.length} модераторов` : tab === "chat" ? "Переписки с пользователями" : `${posts.length} записей`}
           </p>
           <button onClick={() => fetchData(tab)} className="flex items-center gap-1 text-purple-400 text-sm hover:text-purple-300 transition-colors">
             <Icon name="RefreshCw" size={14} /> Обновить
@@ -255,6 +258,8 @@ export default function Admin() {
                 deleteMember={deleteMember}
               />
             )}
+
+            {tab === "chat" && <AdminChat />}
 
             {(tab === "blacklist" || tab === "bans") && (
               <AdminBlacklist

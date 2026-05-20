@@ -35,7 +35,25 @@ export const AVATAR_GRADIENTS = [
   "bg-gradient-to-br from-pink-500 to-orange-500",
 ]
 
-export type AdminTab = "questions" | "requests" | "members" | "blacklist" | "bans"
+export const CHAT_URL = "https://functions.poehali.dev/6e998cf5-9a0d-4dd8-8d73-effc01322bfd"
+
+export type AdminTab = "questions" | "requests" | "members" | "blacklist" | "bans" | "chat"
+
+export type ChatUser = {
+  id: number
+  username: string
+  email: string
+  msg_count: number
+  last_message: string | null
+  unread: number
+}
+
+export type ChatMsg = {
+  id: number
+  text: string
+  is_admin: boolean
+  created_at: string
+}
 
 export type ForumPost = {
   id: number

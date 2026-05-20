@@ -1,4 +1,6 @@
 {
+  "user-chat": "https://functions.poehali.dev/6e998cf5-9a0d-4dd8-8d73-effc01322bfd",
+  "user-auth": "https://functions.poehali.dev/74b7a868-4833-440f-bd37-34cfa1fbb7ea",
   "jamendo-tracks": "https://functions.poehali.dev/c04270b8-f8fc-4f9c-bafc-dfed5d06202f",
   "dragon-forum": "https://functions.poehali.dev/6d575e2a-93a2-41c0-b2ff-4a247ee4f5b4"
 }

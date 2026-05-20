@@ -1,0 +1,11 @@
+{
+  "tests": [
+    {
+      "name": "Admin list users",
+      "method": "GET",
+      "path": "/?action=admin_list",
+      "headers": {"X-Admin-Token": "carnival2025"},
+      "expectedStatus": 200
+    }
+  ]
+}

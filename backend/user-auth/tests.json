@@ -1,0 +1,18 @@
+{
+  "tests": [
+    {
+      "name": "Login existing user",
+      "method": "POST",
+      "path": "/?action=login",
+      "body": {"email": "test@test.com", "password": "test123"},
+      "expectedStatus": 200
+    },
+    {
+      "name": "Login wrong password",
+      "method": "POST",
+      "path": "/?action=login",
+      "body": {"email": "test@test.com", "password": "wrongpass"},
+      "expectedStatus": 401
+    }
+  ]
+}
